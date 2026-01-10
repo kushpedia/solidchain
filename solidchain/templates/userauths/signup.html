@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Sign Up - SolidChain</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+        }
+        
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .auth-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .auth-body {
+            padding: 30px;
+        }
+        
+        .form-control-mobile {
+            height: 56px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            padding: 0 16px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-control-mobile:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .input-group-mobile {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            z-index: 10;
+        }
+        
+        .input-with-icon {
+            padding-left: 48px !important;
+        }
+        
+        .btn-auth {
+            height: 56px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            font-weight: 600;
+            font-size: 16px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-auth:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+        
+        .btn-outline-auth {
+            height: 56px;
+            border-radius: 12px;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            background: white;
+            font-weight: 600;
+            font-size: 16px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            color: #6c757d;
+        }
+        
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .auth-divider span {
+            padding: 0 15px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Password toggle */
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            z-index: 10;
+        }
+        
+        /* Form rows */
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -5px;
+            margin-left: -5px;
+        }
+        
+        .form-col {
+            flex: 1 0 0%;
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+        
+        /* Help text */
+        .form-text-help {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+        
+        /* Messages */
+        .alert-mobile {
+            border-radius: 12px;
+            border: none;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        /* Logo */
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 576px) {
+            body {
+                padding: 15px;
+            }
+            
+            .auth-header {
+                padding: 30px 20px;
+            }
+            
+            .auth-body {
+                padding: 25px 20px;
+            }
+            
+            .form-control-mobile {
+                height: 52px;
+            }
+            
+            .btn-auth, .btn-outline-auth {
+                height: 52px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .form-col {
+                width: 100%;
+                margin-bottom: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Header -->
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="bi bi-link-45deg"></i>
+                    SolidChain
+                </div>
+                <p class="mb-0 opacity-90">Join your group's contribution system</p>
+            </div>
+            
+            <!-- Body -->
+            <div class="auth-body">
+                <!-- Messages -->
+                {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                    <div class="alert-mobile alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <div class="d-flex align-items-center">
+                            {% if message.tags == 'success' %}
+                                <i class="bi bi-check-circle-fill me-3 fs-5"></i>
+                            {% elif message.tags == 'error' %}
+                                <i class="bi bi-exclamation-triangle-fill me-3 fs-5"></i>
+                            {% endif %}
+                            <div class="flex-grow-1">{{ message }}</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Signup Form -->
+                <form method="post" action="{% url 'userauths:signup' %}">
+                    {% csrf_token %}
+                    
+                    <!-- Name Fields -->
+                    <div class="form-row mb-3">
+                        <div class="form-col">
+                            <label class="form-label fw-bold mb-2">First Name</label>
+                            <div class="input-group-mobile">
+                                <i class="input-icon bi bi-person"></i>
+                                <input type="text" 
+										name="first_name" 
+										class="form-control-mobile input-with-icon" 
+										placeholder="John"
+										value="{{ form.first_name.value|default:'' }}"
+										required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <label class="form-label fw-bold mb-2">Last Name</label>
+                            <div class="input-group-mobile">
+                                <i class="input-icon bi bi-person"></i>
+                                <input type="text" 
+										name="last_name" 
+										class="form-control-mobile input-with-icon" 
+										placeholder="Doe"
+										value="{{ form.last_name.value|default:'' }}"
+										required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Phone -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-2">Phone Number</label>
+                        <div class="input-group-mobile">
+                            <i class="input-icon bi bi-phone"></i>
+                            <input type="tel" 
+									name="phone" 
+									class="form-control-mobile input-with-icon" 
+									placeholder="0712345678"
+									pattern="[0-9]{10}"
+									value="{{ form.phone.value|default:'' }}"
+									required>
+                        </div>
+                        <div class="form-text-help">10 digits, e.g., 0712345678</div>
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-2">Email Address</label>
+                        <div class="input-group-mobile">
+                            <i class="input-icon bi bi-envelope"></i>
+                            <input type="email" 
+									name="email" 
+									class="form-control-mobile input-with-icon" 
+									placeholder="john@example.com"
+									value="{{ form.email.value|default:'' }}"
+									required>
+                        </div>
+                    </div>
+                    
+                    <!-- Username -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-2">Username</label>
+                        <div class="input-group-mobile">
+                            <i class="input-icon bi bi-at"></i>
+                            <input type="text" 
+									name="username" 
+									class="form-control-mobile input-with-icon" 
+									placeholder="johndoe"
+									value="{{ form.username.value|default:'' }}"
+									required>
+                        </div>
+                        <div class="form-text-help">Choose a unique username</div>
+                    </div>
+                    
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-2">Password</label>
+                        <div class="input-group-mobile">
+                            <i class="input-icon bi bi-lock"></i>
+                            <input type="password" 
+									name="password1" 
+									id="password1" 
+									class="form-control-mobile input-with-icon" 
+									placeholder="Create a password"
+									required>
+                            <button type="button" class="password-toggle" id="togglePassword1">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Confirm Password -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-2">Confirm Password</label>
+                        <div class="input-group-mobile">
+                            <i class="input-icon bi bi-lock-fill"></i>
+                            <input type="password" 
+									name="password2" 
+									id="password2" 
+									class="form-control-mobile input-with-icon" 
+									placeholder="Confirm your password"
+									required>
+                            <button type="button" class="password-toggle" id="togglePassword2">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Terms -->
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" class="text-decoration-none">Terms</a> 
+                                and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit -->
+                    <button type="submit" class="btn-auth mb-4">
+                        <i class="bi bi-person-plus"></i>
+                        Create Account
+                    </button>
+                    
+                    <!-- Divider -->
+                    <div class="auth-divider">
+                        <span>Already have an account?</span>
+                    </div>
+                    
+                    <!-- Login Link -->
+                    <a href="{% url 'userauths:login' %}" class="btn-outline-auth">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Sign In Instead
+                    </a>
+                </form>
+                
+                <!-- Footer -->
+                <div class="text-center mt-4">
+                    <p class="text-muted text-small-mobile" style="font-size: 14px;">
+                        <i class="bi bi-people-fill me-1"></i>
+                        Connect with your group members
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Password toggles
+        function setupPasswordToggle(toggleId, passwordId) {
+            const toggle = document.querySelector(toggleId);
+            const password = document.querySelector(passwordId);
+            
+            toggle.addEventListener('click', function() {
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                this.innerHTML = type === 'password' ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+            });
+        }
+        
+        setupPasswordToggle('#togglePassword1', '#password1');
+        setupPasswordToggle('#togglePassword2', '#password2');
+        
+        // Auto-focus first field
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstField = document.querySelector('input[type="text"]');
+            if (firstField) {
+                firstField.focus();
+            }
+        });
+        
+        // Phone number formatting
+        const phoneField = document.querySelector('input[name="phone"]');
+        if (phoneField) {
+            phoneField.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '').slice(0, 10);
+            });
+        }
+        
+        // Username suggestion from email
+        const emailField = document.querySelector('input[name="email"]');
+        const usernameField = document.querySelector('input[name="username"]');
+        
+        if (emailField && usernameField) {
+            emailField.addEventListener('blur', function() {
+                if (!usernameField.value) {
+                    const email = this.value;
+                    const suggestedUsername = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+                    usernameField.value = suggestedUsername;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

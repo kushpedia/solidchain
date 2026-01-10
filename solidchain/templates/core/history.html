@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment History - SolidChain{% endblock %}
+{% load humanize %}
+{% block content %}
+<!-- Header -->
+<div class="card-mobile mb-4">
+    <div class="card-body-mobile">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h1 class="h4 fw-bold mb-1">Payment History</h1>
+                <p class="text-muted mb-0 text-small-mobile">
+                    <i class="bi bi-clock-history me-1"></i>
+                    View all your contributions
+                </p>
+            </div>
+            <div class="text-end">
+                <div class="fw-bold fs-4">KSh {{ total_amount|floatformat:0|intcomma }}</div>
+                <div class="text-tiny-mobile text-muted">Total Paid</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Summary -->
+<div class="row g-2 mb-4">
+    <div class="col-4">
+        <div class="stat-card-mobile">
+            <div class="stat-number">{{ total_count }}</div>
+            <div class="stat-label">Total</div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="stat-card-mobile">
+            <div class="stat-number text-success">{{ on_time_count }}</div>
+            <div class="stat-label">On Time</div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="stat-card-mobile">
+            <div class="stat-number text-danger">KSh {{ total_fines|floatformat:0|intcomma }}</div>
+            <div class="stat-label">Fines</div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Bar -->
+<div class="card-mobile mb-4">
+    <div class="card-body-mobile">
+        <div class="d-flex justify-content-between mb-2">
+            <span class="fw-bold">On Time Performance</span>
+            <span class="fw-bold text-primary">{{ on_time_percentage|floatformat:0 }}%</span>
+        </div>
+        <div class="progress-mobile mb-3">
+            <div class="progress-bar-mobile bg-success" style="width: {{ on_time_percentage }}%"></div>
+        </div>
+        <div class="row text-center g-3">
+            <div class="col-6">
+                <div class="p-2 bg-light rounded">
+                    <div class="fw-bold">{{ late_count }}</div>
+                    <div class="text-tiny-mobile text-muted">Late Payments</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="p-2 bg-light rounded">
+                    <div class="fw-bold">{{ on_time_count }}</div>
+                    <div class="text-tiny-mobile text-muted">On Time</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Tabs -->
+<div class="card-mobile mb-4">
+    <div class="card-body-mobile p-0">
+        <div class="nav nav-pills nav-fill px-3 pt-3" id="filterTabs" role="tablist">
+            <button class="nav-link active flex-grow-1 mx-1" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                All
+            </button>
+            <button class="nav-link flex-grow-1 mx-1" id="ontime-tab" data-bs-toggle="tab" data-bs-target="#ontime" type="button" role="tab">
+                On Time
+            </button>
+            <button class="nav-link flex-grow-1 mx-1" id="late-tab" data-bs-toggle="tab" data-bs-target="#late" type="button" role="tab">
+                Late
+            </button>
+        </div>
+        
+        <div class="tab-content p-3">
+            <!-- All Payments Tab -->
+            <div class="tab-pane fade show active" id="all" role="tabpanel">
+                {% if payments %}
+                <div class="list-group list-group-flush">
+                    {% for payment in payments %}
+                    <div class="list-group-item border-0 px-0 py-3">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                                    style="width: 50px; height: 50px; background: {% if payment.status == 'On Time' %}#e7f6ff{% else %}#fff0e6{% endif %}">
+                                    <i class="bi {% if payment.status == 'On Time' %}bi-check-circle-fill text-success{% else %}bi-clock-fill text-warning{% endif %} fs-5"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <h6 class="fw-bold mb-0">{{ payment.month.month|date:"F Y" }}</h6>
+                                    <span class="badge-mobile {% if payment.status == 'On Time' %}badge-success-mobile{% else %}badge-warning-mobile{% endif %}">
+                                        {{ payment.status }}
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-between text-small-mobile text-muted mb-2">
+                                    <span>
+                                        <i class="bi bi-calendar me-1"></i>
+                                        Paid: {{ payment.paid_date|date:"M d, Y" }}
+                                    </span>
+                                    <span>
+                                        Days late: {{ payment.days_late }}
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <span class="fw-bold">KSh {{ payment.amount_paid|floatformat:0|intcomma }}</span>
+                                        <span class="text-small-mobile text-muted"> amount</span>
+                                    </div>
+                                    {% if payment.fine_amount > 0 %}
+                                    <div class="text-end">
+                                        <div class="text-danger fw-bold">KSh {{ payment.fine_amount|floatformat:0|intcomma }}</div>
+                                        <div class="text-tiny-mobile text-danger">Fine</div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if not forloop.last %}
+                    <hr class="my-2">
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-receipt display-4 text-muted mb-3"></i>
+                    <p class="text-muted">No payment history found.</p>
+                    <p class="text-small-mobile text-muted">Payments will appear here once recorded.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- On Time Payments Tab -->
+            <div class="tab-pane fade" id="ontime" role="tabpanel">
+                {% with payments|filter_by_status:"On Time" as on_time_payments %}
+                {% if on_time_payments %}
+                <div class="list-group list-group-flush">
+                    {% for payment in on_time_payments %}
+                    <div class="list-group-item border-0 px-0 py-3">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" 
+                                    style="width: 50px; height: 50px;">
+                                    <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-1">{{ payment.month.month|date:"F Y" }}</h6>
+                                <div class="text-small-mobile text-muted mb-2">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    Paid on {{ payment.paid_date|date:"M d, Y" }}
+                                </div>
+                                <div class="fw-bold">KSh {{ payment.amount_paid|floatformat:0|intcomma }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if not forloop.last %}
+                    <hr class="my-2">
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle display-4 text-muted mb-3"></i>
+                    <p class="text-muted">No on-time payments found.</p>
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+            
+            <!-- Late Payments Tab -->
+            <div class="tab-pane fade" id="late" role="tabpanel">
+                {% with payments|filter_by_status:"Late" as late_payments %}
+                {% if late_payments %}
+                <div class="list-group list-group-flush">
+                    {% for payment in late_payments %}
+                    <div class="list-group-item border-0 px-0 py-3">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" 
+                                    style="width: 50px; height: 50px;">
+                                    <i class="bi bi-clock-fill text-warning fs-5"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <h6 class="fw-bold mb-0">{{ payment.month.month|date:"F Y" }}</h6>
+                                    <span class="badge bg-warning text-dark">Late</span>
+                                </div>
+                                <div class="text-small-mobile text-muted mb-2">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    Paid: {{ payment.paid_date|date:"M d, Y" }}
+                                    • {{ payment.days_late }} days late
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <span class="fw-bold">KSh {{ payment.amount_paid|floatformat:0|intcomma }}</span>
+                                        <span class="text-small-mobile text-muted"> amount</span>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="text-danger fw-bold">KSh {{ payment.fine_amount|floatformat:0|intcomma }}</div>
+                                        <div class="text-tiny-mobile text-danger">Fine</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if not forloop.last %}
+                    <hr class="my-2">
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-emoji-smile display-4 text-muted mb-3"></i>
+                    <p class="text-muted">No late payments found. Great job!</p>
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Card -->
+<div class="card-mobile mb-4">
+    <div class="card-body-mobile">
+        <h5 class="fw-bold mb-3">Summary</h5>
+        <div class="row g-3">
+            <div class="col-6">
+                <div class="p-3 bg-light rounded">
+                    <div class="fw-bold fs-4 text-primary">KSh {{ total_amount|floatformat:0|intcomma }}</div>
+                    <div class="text-tiny-mobile text-muted">Total Contributions</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="p-3 bg-light rounded">
+                    <div class="fw-bold fs-4 text-danger">KSh {{ total_fines|floatformat:0|intcomma }}</div>
+                    <div class="text-tiny-mobile text-muted">Total Fines Paid</div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3 text-center">
+            <div class="text-muted text-small-mobile">
+                <i class="bi bi-info-circle me-1"></i>
+                Showing {{ payments|length }} payment{{ payments|length|pluralize }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Back Button -->
+<div class="d-grid gap-2">
+    <a href="{% url 'core:dashboard' %}" class="btn btn-outline-primary btn-mobile">
+        <i class="bi bi-arrow-left"></i>
+        Back to Dashboard
+    </a>
+</div>
+
+<!-- JavaScript for Filter Tabs -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Store tab state
+    const filterTabs = document.querySelectorAll('#filterTabs button');
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            localStorage.setItem('activeHistoryTab', this.id);
+        });
+    });
+    
+    // Restore active tab
+    const activeTab = localStorage.getItem('activeHistoryTab');
+    if (activeTab) {
+        const tabElement = document.getElementById(activeTab);
+        if (tabElement) {
+            const tab = new bootstrap.Tab(tabElement);
+            tab.show();
+        }
+    }
+});
+</script>
+{% endblock %}

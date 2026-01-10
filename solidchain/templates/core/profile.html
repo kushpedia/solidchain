@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - SolidChain{% endblock %}
+
+{% block content %}
+<!-- Profile Header -->
+<div class="card-mobile mb-4">
+    <div class="card-body-mobile text-center">
+        <div class="mb-3">
+            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" 
+                 style="width: 80px; height: 80px; font-size: 32px;">
+                {{ member.user.first_name|first|default:member.user.username|first|upper }}
+            </div>
+        </div>
+        <h1 class="h3 fw-bold mb-1">{{ member.user.get_full_name|default:member.user.username }}</h1>
+        <p class="text-muted mb-0">
+            <i class="bi bi-person-badge me-1"></i>
+            Member #{{ member.id }}
+        </p>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-2 mb-4">
+    <div class="col-6">
+        <div class="stat-card-mobile">
+            <div class="stat-number text-primary">{{ total_payments }}</div>
+            <div class="stat-label">Total Months</div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="stat-card-mobile">
+            <div class="stat-number text-success">{{ on_time_count }}</div>
+            <div class="stat-label">On Time</div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="stat-card-mobile">
+            <div class="stat-number text-warning">{{ late_count }}</div>
+            <div class="stat-label">Late</div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="stat-card-mobile">
+            <div class="stat-number">
+                {% if total_payments > 0 %}
+                    {{ on_time_percentage|floatformat:0 }}%
+                {% else %}
+                    0%
+                {% endif %}
+            </div>
+            <div class="stat-label">On Time Rate</div>
+        </div>
+    </div>
+</div>
+
+<!-- Personal Information -->
+<div class="card-mobile mb-4">
+    <div class="card-header-mobile">
+        <i class="bi bi-person-lines-fill me-2"></i>
+        Personal Information
+    </div>
+    <div class="card-body-mobile">
+        <div class="list-group list-group-flush">
+            <div class="list-group-item border-0 px-0 py-3">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="text-muted text-small-mobile">Full Name</div>
+                    </div>
+                    <div class="col-8">
+                        <div class="fw-bold">{{ member.user.get_full_name|default:"Not set" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="list-group-item border-0 px-0 py-3">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="text-muted text-small-mobile">Username</div>
+                    </div>
+                    <div class="col-8">
+                        <div class="fw-bold">{{ member.user.username }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="list-group-item border-0 px-0 py-3">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="text-muted text-small-mobile">Email</div>
+                    </div>
+                    <div class="col-8">
+                        <div class="fw-bold">{{ member.user.email|default:"Not set" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="list-group-item border-0 px-0 py-3">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="text-muted text-small-mobile">Phone</div>
+                    </div>
+                    <div class="col-8">
+                        <div class="fw-bold">{{ member.phone|default:"Not set" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="list-group-item border-0 px-0 py-3">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="text-muted text-small-mobile">Member Since</div>
+                    </div>
+                    <div class="col-8">
+                        <div class="fw-bold">{{ member.joined_date|date:"F d, Y" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="list-group-item border-0 px-0 py-3">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="text-muted text-small-mobile">Status</div>
+                    </div>
+                    <div class="col-8">
+                        <span class="badge-mobile badge-success-mobile">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Active Member
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Account Summary -->
+<div class="card-mobile mb-4">
+    <div class="card-header-mobile">
+        <i class="bi bi-pie-chart-fill me-2"></i>
+        Account Summary
+    </div>
+    <div class="card-body-mobile">
+        <div class="row g-3 mb-3">
+            <div class="col-6">
+                <div class="p-3 bg-light rounded text-center">
+                    <div class="fw-bold fs-4">{{ total_payments }}</div>
+                    <div class="text-tiny-mobile text-muted">Months Paid</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="p-3 bg-light rounded text-center">
+                    <div class="fw-bold fs-4">{{ on_time_count }}</div>
+                    <div class="text-tiny-mobile text-muted">On Time</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span class="text-small-mobile">On Time Rate</span>
+                <span class="text-small-mobile fw-bold">
+                    {% if total_payments > 0 %}
+                        {{ on_time_percentage|floatformat:0 }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </span>
+            </div>
+            <div class="progress-mobile">
+                <div class="progress-bar-mobile bg-success" 
+                    style="width: {% if total_payments > 0 %}{{ on_time_percentage }}{% else %}0{% endif %}%">
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-3">
+            <div class="text-muted text-small-mobile">
+                <i class="bi bi-info-circle me-1"></i>
+                Based on {{ total_payments }} payment{{ total_payments|pluralize }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card-mobile">
+    <div class="card-body-mobile">
+        <h5 class="fw-bold mb-3">Quick Actions</h5>
+        <div class="d-grid gap-2">
+            <a href="{% url 'core:dashboard' %}" class="btn btn-primary-mobile btn-mobile">
+                <i class="bi bi-house"></i>
+                Go to Dashboard
+            </a>
+            <a href="{% url 'core:history' %}" class="btn btn-outline-primary btn-mobile">
+                <i class="bi bi-clock-history"></i>
+                View Payment History
+            </a>
+            <button class="btn btn-outline-secondary btn-mobile" onclick="alert('Contact admin to update your information')">
+                <i class="bi bi-pencil"></i>
+                Update Information
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Member Since Badge -->
+<div class="text-center mt-4">
+    <div class="badge bg-light text-dark p-3">
+        <i class="bi bi-award me-2"></i>
+        Member since {{ member_since }}
+    </div>
+</div>
+
+<!-- Security Note -->
+<div class="text-center mt-3">
+    <p class="text-tiny-mobile text-muted">
+        <i class="bi bi-shield-check me-1"></i>
+        Your information is secure and private
+    </p>
+</div>
+{% endblock %}

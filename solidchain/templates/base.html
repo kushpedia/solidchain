@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>{% block title %}SolidChain{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+        }
+        
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            padding-bottom: 80px; /* Space for bottom nav */
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Mobile-first container */
+        .container-mobile {
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+            max-width: 100%;
+        }
+        
+        @media (min-width: 576px) {
+            .container-mobile {
+                max-width: 540px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .container-mobile {
+                max-width: 720px;
+                padding-bottom: 20px;
+            }
+            body {
+                padding-bottom: 20px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .container-mobile {
+                max-width: 960px;
+            }
+        }
+        
+        /* Cards for mobile */
+        .card-mobile {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .card-header-mobile {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 16px 20px;
+            border-bottom: none;
+            border-radius: 16px 16px 0 0 !important;
+            font-weight: 600;
+        }
+        
+        .card-body-mobile {
+            padding: 20px;
+            background: white;
+        }
+        
+        /* Buttons for touch */
+        .btn-mobile {
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 50px;
+        }
+        
+        .btn-primary-mobile {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-primary-mobile:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+        
+        /* Mobile bottom navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 8px 0;
+            display: flex;
+            justify-content: space-around;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .nav-item-mobile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            flex: 1;
+            padding: 8px 4px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        
+        .nav-item-mobile:active {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .nav-active {
+            color: var(--primary);
+        }
+        
+        /* Hide bottom nav on desktop */
+        @media (min-width: 768px) {
+            .bottom-nav {
+                display: none;
+            }
+        }
+        
+        /* Top navigation for desktop */
+        .top-nav {
+            display: none;
+        }
+        
+        @media (min-width: 768px) {
+            .top-nav {
+                display: block;
+            }
+        }
+        
+        /* Status badges */
+        .badge-mobile {
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .badge-success-mobile {
+            background-color: rgba(76, 201, 240, 0.15);
+            color: #0a58ca;
+        }
+        
+        .badge-warning-mobile {
+            background-color: rgba(248, 150, 30, 0.15);
+            color: #fd7e14;
+        }
+        
+        .badge-danger-mobile {
+            background-color: rgba(247, 37, 133, 0.15);
+            color: #dc3545;
+        }
+        
+        /* Tables for mobile */
+        .table-mobile {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table-mobile th,
+        .table-mobile td {
+            padding: 12px 8px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .table-mobile th {
+            font-weight: 600;
+            color: #666;
+            font-size: 14px;
+            background-color: #f9f9f9;
+        }
+        
+        /* Stats cards */
+        .stat-card-mobile {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 12px;
+        }
+        
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        /* Alerts for mobile */
+        .alert-mobile {
+            border-radius: 12px;
+            border: none;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        /* Progress bars */
+        .progress-mobile {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            overflow: hidden;
+        }
+        
+        .progress-bar-mobile {
+            height: 100%;
+            border-radius: 4px;
+        }
+        
+        /* Text sizes for mobile */
+        .text-small-mobile {
+            font-size: 14px;
+        }
+        
+        .text-tiny-mobile {
+            font-size: 12px;
+        }
+        
+        /* Loading animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+        /* Add to your existing styles in base.html */
+    select.form-control, 
+    input[type="date"].form-control,
+    input[type="number"].form-control {
+        height: 56px;
+        border-radius: 12px;
+        border: 2px solid #e9ecef;
+        padding: 0 16px;
+        font-size: 16px;
+        width: 100%;
+        transition: all 0.3s;
+    }
+
+    select.form-control:focus,
+    input[type="date"].form-control:focus,
+    input[type="number"].form-control:focus {
+        border-color: #4361ee;
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        outline: none;
+    }
+
+    .form-text-help {
+        font-size: 12px;
+        color: #6c757d;
+        margin-top: 4px;
+    }
+    </style>
+    <style>
+        /* Toast animations */
+        .toast {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Form validation styles */
+        .is-valid {
+            border-color: #198754 !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        .is-invalid {
+            border-color: #dc3545 !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        /* Preview animations */
+        #finePreview {
+            transition: all 0.3s ease;
+        }
+        
+        /* Loading indicator */
+        .loading {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #4361ee;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Top Navigation (Desktop) -->
+    <nav class="top-nav navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container-mobile">
+            <a class="navbar-brand fw-bold" href="{% url 'core:dashboard' %}">
+                <i class="bi bi-link-45deg me-2"></i>SolidChain
+            </a>
+            
+            {% if user.is_authenticated %}
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle me-2"></i>
+                        <span class="d-none d-md-inline">{{ user.first_name|default:user.username|truncatechars:15 }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'core:dashboard' %}">
+                            <i class="bi bi-house me-2"></i>Dashboard
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'core:history' %}">
+                            <i class="bi bi-clock-history me-2"></i>History
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'core:profile' %}">
+                            <i class="bi bi-person me-2"></i>Profile
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'userauths:logout' %}">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container-mobile mt-3">
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+            <div class="alert-mobile alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-center">
+                    {% if message.tags == 'success' %}
+                        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                    {% elif message.tags == 'error' %}
+                        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                    {% elif message.tags == 'warning' %}
+                        <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+                    {% else %}
+                        <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                    {% endif %}
+                    <div class="flex-grow-1">{{ message }}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    {% if user.is_authenticated %}
+    <nav class="bottom-nav">
+        <a href="{% url 'core:dashboard' %}" class="nav-item-mobile {% if request.resolver_match.url_name == 'dashboard' %}nav-active{% endif %}">
+            <i class="nav-icon bi bi-house{% if request.resolver_match.url_name == 'dashboard' %}-fill{% endif %}"></i>
+            <span class="nav-label">Home</span>
+        </a>
+        
+        <a href="{% url 'core:history' %}" class="nav-item-mobile {% if request.resolver_match.url_name == 'history' %}nav-active{% endif %}">
+            <i class="nav-icon bi bi-clock-history{% if request.resolver_match.url_name == 'history' %}-fill{% endif %}"></i>
+            <span class="nav-label">History</span>
+        </a>
+        
+        <a href="{% url 'core:profile' %}" class="nav-item-mobile {% if request.resolver_match.url_name == 'profile' %}nav-active{% endif %}">
+            <i class="nav-icon bi bi-person{% if request.resolver_match.url_name == 'profile' %}-fill{% endif %}"></i>
+            <span class="nav-label">Profile</span>
+        </a>
+        {% if request.user.is_staff %}
+        <a href="{% url 'core:treasurer_dashboard' %}" class="nav-item-mobile">
+            <i class="nav-icon bi bi-person-video2"></i>
+            <span class="nav-label">Admin</span>
+        </a>
+        
+        {% endif %}
+
+        <a href="{% url 'userauths:logout' %}" class="nav-item-mobile">
+            <i class="nav-icon bi bi-box-arrow-right"></i>
+            <span class="nav-label">Logout</span>
+        </a>
+
+
+        
+
+    </nav>
+    {% endif %}
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Mobile touch enhancements -->
+    <script>
+        // Add touch feedback
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-dismiss alerts after 4 seconds
+            setTimeout(function() {
+                var alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 4000);
+            
+            // Prevent zoom on double-tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // Add active state to buttons on touch
+            document.querySelectorAll('.btn-mobile').forEach(btn => {
+                btn.addEventListener('touchstart', function() {
+                    this.classList.add('active');
+                });
+                btn.addEventListener('touchend', function() {
+                    this.classList.remove('active');
+                });
+            });
+            
+            // Set active nav based on current URL
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-item-mobile').forEach(nav => {
+                if (nav.getAttribute('href') === currentPath) {
+                    nav.classList.add('nav-active');
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
