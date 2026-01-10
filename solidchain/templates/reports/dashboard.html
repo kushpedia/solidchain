@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports Dashboard - SolidChain{% endblock %}
+{% load humanize %}
+{% block content %}
+<!-- Header -->
+<div class="card-mobile mb-4">
+    <div class="card-body-mobile">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h1 class="h4 fw-bold mb-1">Reports Dashboard</h1>
+                <p class="text-muted mb-0 text-small-mobile">
+                    <i class="bi bi-bar-chart me-1"></i>
+                    Generate and view financial reports
+                </p>
+            </div>
+            <div>
+                <span class="badge bg-primary p-2">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Treasurer Access
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row g-2 mb-4">
+    <div class="col-6">
+        <div class="stat-card-mobile">
+            <div class="stat-number text-primary">{{ total_members }}</div>
+            <div class="stat-label">Total Members</div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="stat-card-mobile">
+            <div class="stat-number text-success">{{ total_payments }}</div>
+            <div class="stat-label">Total Payments</div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="stat-card-mobile">
+            <div class="stat-number text-warning">KSh {{ total_fines_collected|floatformat:0|intcomma }}</div>
+            <div class="stat-label">Total Fines</div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="stat-card-mobile">
+            <div class="stat-number text-danger">{{ recent_reports|length }}</div>
+            <div class="stat-label">Recent Reports</div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Month Status -->
+{% if current_stats %}
+<div class="card-mobile mb-4">
+    <div class="card-header-mobile">
+        <i class="bi bi-calendar-month me-2"></i>
+        {{ current_stats.month.month|date:"F Y" }} - Quick Overview
+    </div>
+    <div class="card-body-mobile">
+        <div class="row text-center g-3 mb-3">
+            <div class="col-4">
+                <div class="p-2 bg-light rounded">
+                    <div class="fw-bold text-primary">{{ current_stats.paid_members }}/{{ current_stats.total_members }}</div>
+                    <div class="text-tiny-mobile text-muted">Paid/Total</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="p-2 bg-light rounded">
+                    <div class="fw-bold text-success">KSh {{ current_stats.total_collected|floatformat:0|intcomma }}</div>
+                    <div class="text-tiny-mobile text-muted">Collected</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="p-2 bg-light rounded">
+                    <div class="fw-bold text-danger">KSh {{ current_stats.total_fines|floatformat:0|intcomma }}</div>
+                    <div class="text-tiny-mobile text-muted">Fines</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-grid">
+            <a href="{% url 'reports:quick_monthly' current_stats.month.id %}" class="btn btn-primary-mobile btn-mobile">
+                <i class="bi bi-eye"></i>
+                View Full Report
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Report Types -->
+<div class="card-mobile mb-4">
+    <div class="card-header-mobile">
+        <i class="bi bi-file-earmark-text me-2"></i>
+        Generate Reports
+    </div>
+    <div class="card-body-mobile">
+        <div class="row g-3">
+            <!-- Monthly Collection Report -->
+            <div class="col-md-6">
+                <div class="card-mobile h-100">
+                    <div class="card-body-mobile text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-calendar-check display-4 text-primary"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Monthly Collection</h5>
+                        <p class="text-muted text-small-mobile mb-3">
+                            Summary of all payments for a specific month
+                        </p>
+                        <a href="{% url 'reports:monthly_report' %}" class="btn btn-primary-mobile btn-mobile w-100">
+                            <i class="bi bi-plus-circle"></i>
+                            Generate Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Member Statement -->
+            <div class="col-md-6">
+                <div class="card-mobile h-100">
+                    <div class="card-body-mobile text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-person-badge display-4 text-success"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Member Statement</h5>
+                        <p class="text-muted text-small-mobile mb-3">
+                            Individual member's payment history and summary
+                        </p>
+                        <a href="{% url 'reports:member_statement' %}" class="btn btn-success-mobile btn-mobile w-100">
+                            <i class="bi bi-plus-circle"></i>
+                            Generate Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Outstanding Payments -->
+            <div class="col-md-6">
+                <div class="card-mobile h-100">
+                    <div class="card-body-mobile text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-clock-history display-4 text-warning"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Outstanding Payments</h5>
+                        <p class="text-muted text-small-mobile mb-3">
+                            Members who haven't paid for selected month
+                        </p>
+                        <a href="{% url 'reports:outstanding_payments' %}" class="btn btn-warning-mobile btn-mobile w-100">
+                            <i class="bi bi-plus-circle"></i>
+                            Generate Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fines Summary -->
+            <div class="col-md-6">
+                <div class="card-mobile h-100">
+                    <div class="card-body-mobile text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-cash-coin display-4 text-danger"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Fines Summary</h5>
+                        <p class="text-muted text-small-mobile mb-3">
+                            Overview of fines collected with detailed breakdown
+                        </p>
+                        <a href="{% url 'reports:fines_summary' %}" class="btn btn-danger-mobile btn-mobile w-100">
+                            <i class="bi bi-plus-circle"></i>
+                            Generate Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Reports -->
+<div class="card-mobile">
+    <div class="card-header-mobile d-flex align-items-center justify-content-between">
+        <div>
+            <i class="bi bi-clock-history me-2"></i>
+            Recent Reports
+        </div>
+        <a href="{% url 'reports:history' %}" class="text-white text-decoration-none text-small-mobile">
+            View All <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+    <div class="card-body-mobile p-0">
+        {% if recent_reports %}
+        <div class="list-group list-group-flush">
+            {% for report in recent_reports %}
+            <div class="list-group-item border-0 px-3 py-3">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" 
+                            style="width: 40px; height: 40px;">
+                            {% if report.report_type == 'monthly' %}
+                                <i class="bi bi-calendar-check text-primary"></i>
+                            {% elif report.report_type == 'member' %}
+                                <i class="bi bi-person text-success"></i>
+                            {% elif report.report_type == 'outstanding' %}
+                                <i class="bi bi-clock text-warning"></i>
+                            {% else %}
+                                <i class="bi bi-cash-coin text-danger"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <h6 class="fw-bold mb-0">{{ report.get_report_type_display }}</h6>
+                            <span class="badge-mobile bg-light text-dark">
+                                {{ report.get_format_display }}
+                            </span>
+                        </div>
+                        <div class="text-small-mobile text-muted">
+                            <i class="bi bi-calendar me-1"></i>
+                            {{ report.generated_at|date:"M d, Y H:i" }}
+                        </div>
+                        {% if report.parameters %}
+                        <div class="text-tiny-mobile text-muted mt-1">
+                            <i class="bi bi-gear me-1"></i>
+                            {% if report.report_type == 'monthly' %}
+                                Month: {{ report.parameters.month_name }}
+                            {% elif report.report_type == 'member' %}
+                                Member: {{ report.parameters.member_name }}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if not forloop.last %}
+            <hr class="my-0 mx-3">
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-file-earmark-text display-4 text-muted mb-3"></i>
+            <p class="text-muted">No reports generated yet.</p>
+            <p class="text-small-mobile text-muted">Generate your first report above.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="d-grid gap-2 mt-4">
+    <a href="{% url 'core:treasurer_dashboard' %}" class="btn btn-outline-primary btn-mobile">
+        <i class="bi bi-arrow-left"></i>
+        Back to Treasurer Dashboard
+    </a>
+</div>
+
+<style>
+.btn-success-mobile {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+}
+
+.btn-warning-mobile {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+    color: white;
+}
+
+.btn-danger-mobile {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+}
+</style>
+{% endblock %}

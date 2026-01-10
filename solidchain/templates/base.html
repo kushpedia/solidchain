@@ -391,6 +391,11 @@
                         <li><a class="dropdown-item" href="{% url 'core:profile' %}">
                             <i class="bi bi-person me-2"></i>Profile
                         </a></li>
+                        <li><a class="dropdown-item" href="{% url 'reports:dashboard' %}">
+                            <i class="bi bi-bar-chart me-2"></i>Reports
+                            </a>
+                        </li>
+
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="{% url 'userauths:logout' %}">
                             <i class="bi bi-box-arrow-right me-2"></i>Logout
@@ -452,6 +457,11 @@
         <a href="{% url 'core:treasurer_dashboard' %}" class="nav-item-mobile">
             <i class="nav-icon bi bi-person-video2"></i>
             <span class="nav-label">Admin</span>
+        </a>
+
+        <a href="{% url 'reports:dashboard' %}" class="nav-item-mobile {% if 'reports' in request.path %}nav-active{% endif %}">
+            <i class="nav-icon bi bi-bar-chart{% if 'reports' in request.path %}-fill{% endif %}"></i>
+            <span class="nav-label">Reports</span>
         </a>
         
         {% endif %}

@@ -51,7 +51,27 @@
         </div>
     </div>
 </div>
-
+<div class="card-mobile mb-4">
+    <div class="card-header-mobile">
+        <i class="bi bi-bar-chart me-2"></i>
+        Financial Reports
+    </div>
+    <div class="card-body-mobile">
+        <p class="text-muted text-small-mobile mb-3">
+            Generate detailed financial reports and member statements
+        </p>
+        <div class="d-grid gap-2">
+            <a href="{% url 'reports:dashboard' %}" class="btn btn-primary-mobile btn-mobile">
+                <i class="bi bi-bar-chart"></i>
+                Go to Reports Dashboard
+            </a>
+            <a href="{% url 'reports:monthly_report' %}" class="btn btn-outline-primary btn-mobile">
+                <i class="bi bi-calendar-check"></i>
+                Monthly Collection Report
+            </a>
+        </div>
+    </div>
+</div>
 <!-- Current Month Status -->
 <div class="card-mobile mb-4">
     <div class="card-header-mobile">
