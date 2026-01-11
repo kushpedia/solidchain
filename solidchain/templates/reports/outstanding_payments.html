@@ -130,19 +130,16 @@
             <div class="d-flex justify-content-between mb-1">
                 <span class="text-small-mobile">Collection Status</span>
                 <span class="text-small-mobile fw-bold">
-                    {% with total=outstanding_data.count|add:month.payments.count %}
-                        {% if total > 0 %}
-                            {{ month.payments.count|default:0 }}/{{ total }} ({{ month.payments.count|divisibleby:total|multiply:100|floatformat:1 }}%)
-                        {% else %}
-                            0%
-                        {% endif %}
-                    {% endwith %}
+                    {% if outstanding_data.total_members > 0 %}
+                        {{ outstanding_data.paid_count|default:0 }}/{{ outstanding_data.total_members }} 
+                        ({{ outstanding_data.collection_rate|floatformat:1 }}%)
+                    {% else %}
+                        0/0 (0%)
+                    {% endif %}
                 </span>
             </div>
             <div class="progress-mobile">
-                <div class="progress-bar-mobile bg-primary" 
-                    style="width: {% with total=outstanding_data.count|add:month.payments.count %}{% if total > 0 %}{{ month.payments.count|divisibleby:total|multiply:100 }}{% else %}0{% endif %}{% endwith %}%">
-                </div>
+                <div class="progress-bar-mobile bg-primary" style="width: {{ outstanding_data.collection_rate|default:0 }}%"></div>
             </div>
         </div>
         

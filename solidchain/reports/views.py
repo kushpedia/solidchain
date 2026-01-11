@@ -105,6 +105,7 @@ def get_member_statement(member, start_date=None, end_date=None):
     
     return summary
 
+
 def get_outstanding_payments(month):
     """Get list of members who haven't paid for a specific month"""
     paid_member_ids = Payment.objects.filter(month=month).values_list('member_id', flat=True)
@@ -114,12 +115,26 @@ def get_outstanding_payments(month):
         id__in=paid_member_ids
     ).select_related('user').order_by('user__first_name')
     
+    paid_count = Payment.objects.filter(month=month).count()
+    total_members = Member.objects.filter(is_active=True).count()
+    outstanding_count = outstanding_members.count()
+    
+    # Calculate collection rate
+    if total_members > 0:
+        collection_rate = (paid_count / total_members) * 100
+    else:
+        collection_rate = 0
+    
     return {
         'month': month,
         'outstanding_members': outstanding_members,
-        'count': outstanding_members.count(),
-        'total_amount': outstanding_members.count() * 2500,  # Monthly contribution
+        'count': outstanding_count,
+        'paid_count': paid_count,  # Add this
+        'total_members': total_members,  # Add this
+        'collection_rate': collection_rate,  # Add this
+        'total_amount': outstanding_count * 2500,  # Monthly contribution
     }
+
 
 def get_fines_summary(start_date=None, end_date=None, group_by_month=True):
     """Get fines summary with optional grouping"""
