@@ -84,6 +84,13 @@
                         <div class="form-check">
                             {{ choice.tag }}
                             <label class="form-check-label" for="{{ choice.id_for_label }}">
+                                {% if choice.choice_label == 'HTML' %}
+                                    <i class="bi bi-file-earmark-text me-1"></i>
+                                {% elif choice.choice_label == 'PDF' %}
+                                    <i class="bi bi-file-pdf me-1"></i>
+                                {% elif choice.choice_label == 'Excel' %}
+                                    <i class="bi bi-file-earmark-excel me-1"></i>
+                                {% endif %}
                                 {{ choice.choice_label }}
                             </label>
                         </div>
