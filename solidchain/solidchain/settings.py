@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-u45!67p7!g=yj95z$i_-w7-%k@u$pbvjr68iqryk-7^v^2wu4^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["749484bd96e9.ngrok-free.app","localhost","192.168.100.57","192.168.8.165","127.0.0.1"]
+ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
     "https://749484bd96e9.ngrok-free.app", # HTTPS version of your ngrok URL
     
@@ -60,6 +60,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+	'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -101,11 +102,11 @@ WSGI_APPLICATION = 'solidchain.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': "solidchain_db_core",
-        'USER': "postgres",
-        'PASSWORD': "Kushpedia12",
-        'HOST': "localhost",
-        'PORT': 5432,
+        'NAME': 'solidchain',
+        'USER': 'solidchain_user',
+        'PASSWORD': 'R1nsbNW4xJ05hwv638nxZRBWMTUMQ4ND',
+        'HOST': 'dpg-d6ujt8q4d50c73f6a64g-a.oregon-postgres.render.com',
+        'PORT': '5432',  # PostgreSQL default port
     }
 }
 

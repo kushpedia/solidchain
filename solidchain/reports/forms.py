@@ -27,7 +27,8 @@ class MonthlyReportForm(forms.Form):
     )
     
     format = forms.ChoiceField(
-        choices=[('html', 'HTML'), ('pdf', 'PDF'), ('excel', 'Excel')],
+        # choices=[('html', 'HTML'), ('pdf', 'PDF'), ('excel', 'Excel')],
+        choices=[('html', 'HTML')],
         initial='html',
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
     )

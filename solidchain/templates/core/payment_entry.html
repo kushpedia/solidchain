@@ -17,7 +17,7 @@
             <div>
                 <span class="badge bg-danger p-2">
                     <i class="bi bi-shield-lock me-1"></i>
-                    Admin Only
+                    Staff Only
                 </span>
             </div>
         </div>
@@ -43,6 +43,13 @@
 </div>
 {% endif %}
 
+<!-- MONTHS_DATA from server -->
+<script>
+    // Pass month data from Django to JavaScript
+    const MONTHS_DATA = {{ months_data_json|safe }};
+    console.log('📊 Loaded month data for', Object.keys(MONTHS_DATA).length, 'months');
+</script>
+
 <!-- Payment Form -->
 <div class="card-mobile mb-4">
     <div class="card-header-mobile">
@@ -59,9 +66,15 @@
                     <i class="bi bi-person me-1"></i>
                     Select Member *
                 </label>
-                {{ form.member }}
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-person-fill"></i>
+                    </span>
+                    {{ form.member }}
+                </div>
                 {% if form.member.errors %}
                 <div class="text-danger text-small-mobile mt-1">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
                     {{ form.member.errors }}
                 </div>
                 {% endif %}
@@ -73,13 +86,20 @@
                     <i class="bi bi-calendar me-1"></i>
                     Contribution Month *
                 </label>
-                {{ form.month }}
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-calendar-month"></i>
+                    </span>
+                    {{ form.month }}
+                </div>
                 {% if form.month.errors %}
                 <div class="text-danger text-small-mobile mt-1">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
                     {{ form.month.errors }}
                 </div>
                 {% endif %}
                 <div class="form-text-help">
+                    <i class="bi bi-info-circle me-1"></i>
                     Only unlocked months are shown
                 </div>
             </div>
@@ -91,9 +111,15 @@
                         <i class="bi bi-calendar-date me-1"></i>
                         Paid Date *
                     </label>
-                    {{ form.paid_date }}
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-calendar-check"></i>
+                        </span>
+                        {{ form.paid_date }}
+                    </div>
                     {% if form.paid_date.errors %}
                     <div class="text-danger text-small-mobile mt-1">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
                         {{ form.paid_date.errors }}
                     </div>
                     {% endif %}
@@ -105,49 +131,83 @@
                         <i class="bi bi-currency-exchange me-1"></i>
                         Amount Paid (KSh) *
                     </label>
-                    {{ form.amount_paid }}
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            KSh
+                        </span>
+                        {{ form.amount_paid }}
+                    </div>
                     {% if form.amount_paid.errors %}
                     <div class="text-danger text-small-mobile mt-1">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
                         {{ form.amount_paid.errors }}
                     </div>
                     {% endif %}
                     <div class="form-text-help">
-                        Default: 2,500
+                        <i class="bi bi-info-circle me-1"></i>
+                        Default: 2,500 (monthly contribution)
                     </div>
                 </div>
             </div>
             
             <!-- Fine Preview -->
-            <div class="card bg-light border-0 mb-4" id="finePreview" style="display: none;">
+            <div class="card border-0 mb-4" id="finePreview" style="display: none;">
                 <div class="card-body">
                     <h6 class="fw-bold mb-3">
                         <i class="bi bi-calculator me-2"></i>
                         Fine Calculation Preview
                     </h6>
-                    <div class="row g-3">
-                        <div class="col-4">
-                            <div class="text-center">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <div class="text-center p-2">
                                 <div class="text-muted text-tiny-mobile">Due Date</div>
                                 <div class="fw-bold" id="dueDatePreview">-</div>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="text-center">
-                                <div class="text-muted text-tiny-mobile">Days Late</div>
-                                <div class="fw-bold text-danger" id="daysLatePreview">0</div>
+                        <div class="col-md-3">
+                            <div class="text-center p-2">
+                                <div class="text-muted text-tiny-mobile">Paid Date</div>
+                                <div class="fw-bold" id="paidDatePreview">-</div>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="text-center">
+                        <div class="col-md-3">
+                            <div class="text-center p-2">
+                                <div class="text-muted text-tiny-mobile">Days Late</div>
+                                <div class="fw-bold" id="daysLatePreview">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-2">
                                 <div class="text-muted text-tiny-mobile">Fine Amount</div>
-                                <div class="fw-bold text-danger" id="fineAmountPreview">KSh 0</div>
+                                <div class="fw-bold" id="fineAmountPreview">KSh 0</div>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Fine Breakdown -->
+                    <div class="row g-2 mb-2" id="fineBreakdown" style="display: none;">
+                        <div class="col-6">
+                            <div class="bg-light rounded p-2">
+                                <div class="text-tiny-mobile text-muted">Early Period</div>
+                                <div class="text-small-mobile" id="earlyPeriodPreview"></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-light rounded p-2">
+                                <div class="text-tiny-mobile text-muted">Late Period</div>
+                                <div class="text-small-mobile" id="latePeriodPreview"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Fine Note -->
+                    <div class="text-center mt-2 text-small-mobile" id="fineNote"></div>
+                    
+                    <!-- Fine Rules -->
                     <div class="mt-3 text-center">
                         <small class="text-muted text-tiny-mobile">
                             <i class="bi bi-info-circle me-1"></i>
-                            Fine rules: 6th-10th = KSh 100/day, 11th+ = KSh 25/day
+                            Fine rules: Due on 5th of following month. First 5 late days = KSh 100/day, after that = KSh 25/day. Stops on 5th of next month.
                         </small>
                     </div>
                 </div>
@@ -155,7 +215,7 @@
             
             <!-- Submit Buttons -->
             <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary-mobile btn-mobile">
+                <button type="submit" class="btn btn-primary-mobile btn-mobile" id="submitBtn">
                     <i class="bi bi-check-circle"></i>
                     Record Payment
                 </button>
@@ -163,6 +223,14 @@
                     <i class="bi bi-x-circle"></i>
                     Cancel
                 </a>
+            </div>
+            
+            <!-- Keyboard Shortcut Hint -->
+            <div class="text-center mt-3">
+                <small class="text-muted text-tiny-mobile">
+                    <i class="bi bi-keyboard me-1"></i>
+                    Shortcut: Ctrl + Enter to submit
+                </small>
             </div>
         </form>
     </div>
@@ -188,7 +256,13 @@
                     <div class="me-3">
                         <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" 
                             style="width: 40px; height: 40px;">
-                            <i class="bi bi-cash text-primary"></i>
+                            {% if payment.status == 'On Time' %}
+                                <i class="bi bi-check-circle text-success"></i>
+                            {% elif payment.status == 'Late' %}
+                                <i class="bi bi-clock-history text-warning"></i>
+                            {% else %}
+                                <i class="bi bi-cash text-primary"></i>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="flex-grow-1">
@@ -196,28 +270,33 @@
                             <div>
                                 <h6 class="fw-bold mb-0">{{ payment.member.user.get_full_name }}</h6>
                                 <small class="text-muted text-tiny-mobile">
+                                    <i class="bi bi-calendar me-1"></i>
                                     {{ payment.month.month|date:"M Y" }}
                                 </small>
                             </div>
-                            <span class="badge-mobile {% if payment.status == 'On Time' %}badge-success-mobile{% else %}badge-warning-mobile{% endif %}">
+                            <span class="badge-mobile 
+                                {% if payment.status == 'On Time' %}badge-success-mobile
+                                {% elif payment.status == 'Late' %}badge-warning-mobile
+                                {% else %}badge-secondary-mobile{% endif %}">
                                 {{ payment.status }}
                             </span>
                         </div>
-                        <div class="d-flex justify-content-between text-small-mobile">
+                        <div class="d-flex justify-content-between text-small-mobile mb-1">
                             <span>
-                                <i class="bi bi-calendar me-1"></i>
-                                {{ payment.paid_date|date:"M d" }}
+                                <i class="bi bi-calendar-check me-1"></i>
+                                {{ payment.paid_date|date:"d/m/Y" }}
                             </span>
                             <span class="fw-bold">KSh {{ payment.amount_paid|floatformat:0|intcomma }}</span>
                             {% if payment.fine_amount > 0 %}
                             <span class="text-danger">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
                                 +KSh {{ payment.fine_amount|floatformat:0|intcomma }} fine
                             </span>
                             {% endif %}
                         </div>
-                        <div class="text-tiny-mobile text-muted mt-1">
+                        <div class="text-tiny-mobile text-muted">
                             <i class="bi bi-person-circle me-1"></i>
-                            Recorded by the Group Treasurer
+                            Recorded on {{ payment.recorded_at|date:"d/m/Y H:i" }}
                         </div>
                     </div>
                 </div>
@@ -237,8 +316,6 @@
     </div>
 </div>
 
-
-
 <!-- Quick Tips -->
 <div class="card-mobile mt-4">
     <div class="card-body-mobile">
@@ -247,28 +324,40 @@
             Quick Tips
         </h6>
         <div class="row g-3">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="text-center p-2">
                     <div class="text-primary mb-1">
-                        <i class="bi bi-5-square fs-4"></i>
+                        <i class="bi bi-calendar5 fs-4"></i>
                     </div>
-                    <div class="text-tiny-mobile">Due on 5th every month</div>
+                    <div class="text-tiny-mobile fw-bold">Due Date</div>
+                    <div class="text-tiny-mobile">5th of following month</div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="text-center p-2">
                     <div class="text-danger mb-1">
                         <i class="bi bi-100-circle fs-4"></i>
                     </div>
-                    <div class="text-tiny-mobile">KSh 100/day (6th-10th)</div>
+                    <div class="text-tiny-mobile fw-bold">Early Fine</div>
+                    <div class="text-tiny-mobile">KSh 100/day (days 1-5)</div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="text-center p-2">
                     <div class="text-warning mb-1">
-                        <i class="bi bi-15-circle fs-4"></i>
+                        <i class="bi bi-25-circle fs-4"></i>
                     </div>
-                    <div class="text-tiny-mobile">KSh 25/day (11th+)</div>
+                    <div class="text-tiny-mobile fw-bold">Late Fine</div>
+                    <div class="text-tiny-mobile">KSh 25/day (day 6+)</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center p-2">
+                    <div class="text-success mb-1">
+                        <i class="bi bi-stop-circle fs-4"></i>
+                    </div>
+                    <div class="text-tiny-mobile fw-bold">Fine Stop</div>
+                    <div class="text-tiny-mobile">5th of next month</div>
                 </div>
             </div>
         </div>
@@ -283,6 +372,8 @@
     </a>
 </div>
 
+<!-- Toast Container -->
+<div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 
 <script>
     // ============================================
@@ -290,11 +381,10 @@
     // ============================================
     const CONFIG = {
         MONTHLY_CONTRIBUTION: 2500,
-        FINE_RATE_EARLY: 100,    // KSh 100/day for days 6-10
-        FINE_RATE_LATE: 25,      // KSh 25/day after 10th
+        FINE_RATE_EARLY: 100,    // KSh 100/day for first 5 days late
+        FINE_RATE_LATE: 25,      // KSh 25/day after 5 days late
         MAX_FINE_DAYS_EARLY: 5,  // First 5 days at 100/day
-        DUE_DATE_DAY: 5,         // Due on 5th of month
-        STOP_FINING_DAY: 5       // Stop fining on 5th of next month
+        STOP_FINING_DAY: 5       // Stop fining on 5th of month after due date
     };
     
     // ============================================
@@ -324,31 +414,26 @@
             finePreview: document.getElementById('finePreview'),
             paymentForm: document.getElementById('paymentForm'),
             memberSelect: document.querySelector('#id_member'),
+            submitBtn: document.getElementById('submitBtn'),
             
             // Preview elements
             dueDatePreview: document.getElementById('dueDatePreview'),
+            paidDatePreview: document.getElementById('paidDatePreview'),
             daysLatePreview: document.getElementById('daysLatePreview'),
             fineAmountPreview: document.getElementById('fineAmountPreview'),
-            fineNote: document.getElementById('fineNote') || createFineNoteElement()
+            fineNote: document.getElementById('fineNote'),
+            fineBreakdown: document.getElementById('fineBreakdown'),
+            earlyPeriodPreview: document.getElementById('earlyPeriodPreview'),
+            latePeriodPreview: document.getElementById('latePeriodPreview')
         };
         
         // Validate all required elements exist
-        const requiredElements = ['monthSelect', 'paidDateInput', 'finePreview', 'paymentForm'];
+        const requiredElements = ['monthSelect', 'paidDateInput', 'paymentForm'];
         requiredElements.forEach(key => {
             if (!elements[key]) {
                 console.error(`❌ Missing required element: ${key}`);
             }
         });
-    }
-    
-    function createFineNoteElement() {
-        const note = document.createElement('div');
-        note.id = 'fineNote';
-        note.className = 'text-center mt-2 text-small-mobile';
-        if (elements.finePreview) {
-            elements.finePreview.querySelector('.card-body').appendChild(note);
-        }
-        return note;
     }
     
     // ============================================
@@ -366,23 +451,39 @@
         // Input validation
         elements.memberSelect?.addEventListener('change', validateMemberSelection);
         elements.paidDateInput?.addEventListener('blur', validateDateInput);
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', handleKeyboardShortcuts);
+    }
+    
+    function handleKeyboardShortcuts(e) {
+        // Ctrl+Enter to submit form
+        if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
+            elements.submitBtn?.click();
+        }
+        
+        // Escape to cancel
+        if (e.key === 'Escape') {
+            const cancelBtn = document.querySelector('a[href*="treasurer_dashboard"]');
+            if (cancelBtn) cancelBtn.click();
+        }
     }
     
     // ============================================
-    // CORE FINE CALCULATION LOGIC
+    // CORRECT FINE CALCULATION LOGIC
     // ============================================
     /**
-     * Calculate fine based on exact Python model rules
-     * Rules:
-     * - 6th-10th: KSh 100 per day (days 1-5 late)
-     * - 11th to next month 5th: KSh 25 per day (days 6+ late)
-     * - Stops fining on 5th of following month
+     * Calculate fine based on NEW logic:
+     * - Contribution month: January 2026
+     * - Deadline: February 5, 2026 (5th of FOLLOWING month)
+     * - Fine period: February 6, 2026 to March 5, 2026
+     * - Stop fining: March 5, 2026
      */
-    function calculateFine(dueDate, paidDate, monthYear, monthMonth) {
+    function calculateFine(dueDate, paidDate) {
         console.group('🧮 Fine Calculation');
-        console.log('Due Date:', dueDate.toLocaleDateString());
+        console.log('Due Date (5th of following month):', dueDate.toLocaleDateString());
         console.log('Paid Date:', paidDate.toLocaleDateString());
-        console.log('Month:', monthYear + '-' + monthMonth);
         
         // Calculate days late
         const msPerDay = 1000 * 60 * 60 * 24;
@@ -391,41 +492,42 @@
         console.log('Raw days late:', daysLate);
         
         if (daysLate <= 0) {
-            console.log('✅ No fine - paid on time');
+            console.log('✅ No fine - paid on or before due date');
             console.groupEnd();
             return {
                 fine: 0,
                 daysLate: 0,
                 maxedOut: false,
-                nextMonth5th: null,
+                stopFiningDate: null,
                 fineBreakdown: { earlyDays: 0, lateDays: 0, earlyAmount: 0, lateAmount: 0 }
             };
         }
         
         // ============================================
-        // CRITICAL: Calculate next month's 5th (when fines stop)
+        // Calculate stop fining date (5th of month AFTER due date month)
+        // Example: Due Feb 5 → Stop Mar 5
         // ============================================
-        let nextMonthYear = monthYear;
-        let nextMonthMonth = monthMonth + 1;
+        let stopFiningYear = dueDate.getFullYear();
+        let stopFiningMonth = dueDate.getMonth() + 2; // Month AFTER due date month
         
-        // Handle December -> January rollover
-        if (monthMonth === 12) {
-            nextMonthYear = monthYear + 1;
-            nextMonthMonth = 1;
+        // Handle year rollover
+        if (stopFiningMonth > 12) {
+            stopFiningYear += 1;
+            stopFiningMonth -= 12;
         }
         
-        const nextMonth5th = new Date(nextMonthYear, nextMonthMonth - 1, CONFIG.STOP_FINING_DAY);
+        const stopFiningDate = new Date(stopFiningYear, stopFiningMonth - 1, CONFIG.STOP_FINING_DAY);
         
-        console.log('Next month 5th:', nextMonth5th.toLocaleDateString());
+        console.log('Stop fining date (5th of month after due date):', stopFiningDate.toLocaleDateString());
         
-        // Check if fines are maxed out (paid after next month's 5th)
-        const maxedOut = paidDate > nextMonth5th;
+        // Check if paid after stop date
+        const maxedOut = paidDate > stopFiningDate;
         
-        // If maxed out, calculate days late only up to next month's 5th
+        // If maxed out, calculate days late only up to stop date
         if (maxedOut) {
-            const maxDaysLate = Math.max(0, Math.floor((nextMonth5th - dueDate) / msPerDay));
+            const maxDaysLate = Math.max(0, Math.floor((stopFiningDate - dueDate) / msPerDay));
             daysLate = maxDaysLate;
-            console.log('⚠️ Fines maxed out - days capped at:', daysLate);
+            console.log('⚠️ Fines maxed out - days capped at:', daysLate, '(stopped on', stopFiningDate.toLocaleDateString() + ')');
         }
         
         // ============================================
@@ -438,7 +540,7 @@
         let lateAmount = 0;
         
         if (daysLate <= CONFIG.MAX_FINE_DAYS_EARLY) {
-            // Early period only (days 1-5 late)
+            // Early period only (first 5 days late)
             earlyDays = daysLate;
             earlyAmount = earlyDays * CONFIG.FINE_RATE_EARLY;
             fineAmount = earlyAmount;
@@ -462,7 +564,7 @@
             fine: fineAmount,
             daysLate: daysLate,
             maxedOut: maxedOut,
-            nextMonth5th: nextMonth5th,
+            stopFiningDate: stopFiningDate,
             fineBreakdown: {
                 earlyDays: earlyDays,
                 lateDays: lateDays,
@@ -478,72 +580,40 @@
     }
     
     // ============================================
-    // DATE HELPER FUNCTIONS
+    // DATE VALIDATION
     // ============================================
-    /**
-     * Get month info from MONTHS_DATA or calculate fallback
-     */
-    function getMonthInfo(monthId) {
-        if (!monthId) return null;
-        
-        // Try to get from embedded MONTHS_DATA first
-        if (window.MONTHS_DATA && window.MONTHS_DATA[monthId]) {
-            const data = window.MONTHS_DATA[monthId];
-            const dueDate = new Date(data.due_date);
-            const monthDate = new Date(data.month_date || data.due_date);
-            
-            return {
-                dueDate: dueDate,
-                monthYear: monthDate.getFullYear(),
-                monthMonth: monthDate.getMonth() + 1,
-                monthName: data.month_name || `Month ${monthId}`
-            };
-        }
-        
-        // Fallback: Calculate from paid date (assume current month)
-        console.warn('Using fallback month calculation for ID:', monthId);
-        const paidDate = elements.paidDateInput?.value ? new Date(elements.paidDateInput.value) : new Date();
-        const dueDate = new Date(paidDate.getFullYear(), paidDate.getMonth(), CONFIG.DUE_DATE_DAY);
-        
-        return {
-            dueDate: dueDate,
-            monthYear: paidDate.getFullYear(),
-            monthMonth: paidDate.getMonth() + 1,
-            monthName: 'Current Month'
-        };
-    }
-    
-    /**
- * Validate date is not in the future
- */
-function validateDateInput() {
+    function validateDateInput() {
     const input = elements.paidDateInput;
     if (!input || !input.value) return true;
     
-    // Get selected date (set to midnight)
     const selectedDate = new Date(input.value);
-    selectedDate.setHours(0, 0, 0, 0);
+    const now = new Date();
     
-    // Get today's date (set to midnight for fair comparison)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Normalize both dates to midnight
+    const selectedMidnight = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
-    console.log('Date validation:', {
-        selected: selectedDate.toISOString(),
-        today: today.toISOString(),
-        selectedDate: selectedDate,
-        todayDate: today
-    });
-    
-    if (selectedDate > today) {
-        showToast('⚠️ Payment date cannot be in the future', 'warning');
-        input.value = today.toISOString().split('T')[0];
+    if (selectedMidnight > todayMidnight) {
+        // Calculate days in future
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const daysInFuture = Math.floor((selectedMidnight - todayMidnight) / msPerDay);
+        
+        let message = 'Payment date cannot be in the future';
+        if (daysInFuture === 1) {
+            message = 'Payment date cannot be tomorrow';
+        } else if (daysInFuture > 1) {
+            message = `Payment date cannot be ${daysInFuture} days in the future`;
+        }
+        
+        showToast(`⚠️ ${message}`, 'warning');
+        input.value = now.toISOString().split('T')[0];
         updateFinePreview();
         return false;
     }
     
     return true;
 }
+    
     // ============================================
     // PREVIEW SYSTEM
     // ============================================
@@ -584,24 +654,20 @@ function validateDateInput() {
             return;
         }
         
-        // Get month info
-        const monthInfo = getMonthInfo(monthId);
+        // Get month info from MONTHS_DATA
+        const monthInfo = MONTHS_DATA[monthId];
         if (!monthInfo) {
-            console.error('❌ Could not get month info for ID:', monthId);
+            console.error('❌ Month not found in MONTHS_DATA:', monthId);
             hidePreview();
             console.groupEnd();
             return;
         }
         
-        console.log('Month info:', monthInfo);
+        const dueDate = new Date(monthInfo.due_date);
+        console.log('Retrieved due date:', dueDate.toLocaleDateString());
         
         // Calculate fine
-        const result = calculateFine(
-            monthInfo.dueDate,
-            paidDate,
-            monthInfo.monthYear,
-            monthInfo.monthMonth
-        );
+        const result = calculateFine(dueDate, paidDate);
         
         // Update preview display
         updatePreviewDisplay(monthInfo, result, paidDate);
@@ -612,7 +678,12 @@ function validateDateInput() {
     function updatePreviewDisplay(monthInfo, result, paidDate) {
         // Update basic info
         if (elements.dueDatePreview) {
-            elements.dueDatePreview.textContent = monthInfo.dueDate.toLocaleDateString();
+            elements.dueDatePreview.textContent = formatDate(new Date(monthInfo.due_date));
+            elements.dueDatePreview.className = result.daysLate > 0 ? 'fw-bold text-danger' : 'fw-bold text-success';
+        }
+        
+        if (elements.paidDatePreview) {
+            elements.paidDatePreview.textContent = formatDate(paidDate);
         }
         
         if (elements.daysLatePreview) {
@@ -625,8 +696,11 @@ function validateDateInput() {
             elements.fineAmountPreview.className = result.fine > 0 ? 'fw-bold text-danger' : 'fw-bold text-success';
         }
         
+        // Update fine breakdown
+        updateFineBreakdown(result);
+        
         // Update fine note
-        updateFineNote(result, monthInfo.dueDate);
+        updateFineNote(result, new Date(monthInfo.due_date));
         
         // Style the preview card
         stylePreviewCard(result);
@@ -635,30 +709,64 @@ function validateDateInput() {
         showPreview();
     }
     
+    function updateFineBreakdown(result) {
+        if (!elements.fineBreakdown) return;
+        
+        const breakdown = result.fineBreakdown;
+        
+        if (result.fine === 0) {
+            elements.fineBreakdown.style.display = 'none';
+            return;
+        }
+        
+        elements.fineBreakdown.style.display = 'flex';
+        
+        if (elements.earlyPeriodPreview) {
+            if (breakdown.earlyDays > 0) {
+                elements.earlyPeriodPreview.innerHTML = `
+                    <div class="fw-bold">${breakdown.earlyDays} days</div>
+                    <div class="text-tiny-mobile">KSh ${CONFIG.FINE_RATE_EARLY}/day</div>
+                    <div class="fw-bold text-danger">KSh ${breakdown.earlyAmount}</div>
+                `;
+            } else {
+                elements.earlyPeriodPreview.innerHTML = '<div class="text-muted">No early fine</div>';
+            }
+        }
+        
+        if (elements.latePeriodPreview) {
+            if (breakdown.lateDays > 0) {
+                elements.latePeriodPreview.innerHTML = `
+                    <div class="fw-bold">${breakdown.lateDays} days</div>
+                    <div class="text-tiny-mobile">KSh ${CONFIG.FINE_RATE_LATE}/day</div>
+                    <div class="fw-bold text-warning">KSh ${breakdown.lateAmount}</div>
+                `;
+            } else {
+                elements.latePeriodPreview.innerHTML = '<div class="text-muted">No late fine</div>';
+            }
+        }
+    }
+    
     function updateFineNote(result, dueDate) {
         if (!elements.fineNote) return;
         
         let noteHTML = '';
         
         if (result.fine === 0) {
-            noteHTML = `<span class="text-success"><i class="bi bi-check-circle me-1"></i>No fine - payment on time</span>`;
+            noteHTML = `<span class="text-success">
+                <i class="bi bi-check-circle me-1"></i>
+                Paid on time (before ${formatDate(dueDate)})
+            </span>`;
         } else if (result.maxedOut) {
-            noteHTML = `<span class="text-warning"><i class="bi bi-exclamation-triangle me-1"></i>`
-                     + `Fines stopped on ${result.nextMonth5th.toLocaleDateString()} (maximum reached)</span>`;
+            noteHTML = `<span class="text-warning">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                Fines stopped on ${formatDate(result.stopFiningDate)} (maximum fine reached)
+            </span>`;
         } else {
             const breakdown = result.fineBreakdown;
-            if (breakdown.lateDays > 0) {
-                noteHTML = `<span class="text-danger">`
-                         + `<i class="bi bi-calculator me-1"></i>`
-                         + `${breakdown.earlyDays} days × KSh ${CONFIG.FINE_RATE_EARLY} + `
-                         + `${breakdown.lateDays} days × KSh ${CONFIG.FINE_RATE_LATE}`
-                         + `</span>`;
-            } else {
-                noteHTML = `<span class="text-danger">`
-                         + `<i class="bi bi-calculator me-1"></i>`
-                         + `${breakdown.earlyDays} days × KSh ${CONFIG.FINE_RATE_EARLY}`
-                         + `</span>`;
-            }
+            noteHTML = `<span class="text-danger">
+                <i class="bi bi-calculator me-1"></i>
+                Fine calculated for ${result.daysLate} late day${result.daysLate !== 1 ? 's' : ''}
+            </span>`;
         }
         
         elements.fineNote.innerHTML = noteHTML;
@@ -667,21 +775,21 @@ function validateDateInput() {
     function stylePreviewCard(result) {
         if (!elements.finePreview) return;
         
-        // Reset all styles
-        elements.finePreview.classList.remove(
-            'bg-light', 'bg-warning', 'bg-opacity-10', 'bg-danger', 
-            'bg-opacity-10', 'border-warning', 'border-danger'
-        );
+        // Reset styles
+        elements.finePreview.classList.remove('border-success', 'border-warning', 'border-danger');
         
-        // Apply new styles based on fine amount
-        if (result.maxedOut) {
-            elements.finePreview.classList.add('bg-warning', 'bg-opacity-10', 'border-warning');
+        if (result.fine === 0) {
+            elements.finePreview.classList.add('border-success');
+            elements.finePreview.style.backgroundColor = 'rgba(25, 135, 84, 0.05)';
+        } else if (result.maxedOut) {
+            elements.finePreview.classList.add('border-warning');
+            elements.finePreview.style.backgroundColor = 'rgba(255, 193, 7, 0.05)';
         } else if (result.fine > 500) {
-            elements.finePreview.classList.add('bg-danger', 'bg-opacity-10', 'border-danger');
-        } else if (result.fine > 0) {
-            elements.finePreview.classList.add('bg-warning', 'bg-opacity-10', 'border-warning');
+            elements.finePreview.classList.add('border-danger');
+            elements.finePreview.style.backgroundColor = 'rgba(220, 53, 69, 0.05)';
         } else {
-            elements.finePreview.classList.add('bg-light');
+            elements.finePreview.classList.add('border-warning');
+            elements.finePreview.style.backgroundColor = 'rgba(255, 193, 7, 0.05)';
         }
     }
     
@@ -691,7 +799,6 @@ function validateDateInput() {
             elements.finePreview.style.opacity = '0';
             elements.finePreview.style.transition = 'opacity 0.3s ease';
             
-            // Trigger fade-in animation
             setTimeout(() => {
                 elements.finePreview.style.opacity = '1';
             }, 10);
@@ -711,7 +818,6 @@ function validateDateInput() {
     // FORM VALIDATION & SUBMISSION
     // ============================================
     function setupFormValidation() {
-        // Add real-time validation indicators
         const inputs = [elements.memberSelect, elements.monthSelect, elements.paidDateInput];
         
         inputs.forEach(input => {
@@ -732,8 +838,7 @@ function validateDateInput() {
     function validateMemberSelection() {
         if (!elements.memberSelect) return true;
         
-        const selectedValue = elements.memberSelect.value;
-        if (!selectedValue) {
+        if (!elements.memberSelect.value) {
             showToast('⚠️ Please select a member', 'warning');
             return false;
         }
@@ -745,45 +850,47 @@ function validateDateInput() {
         e.preventDefault();
         console.group('📋 Form Submission');
         
-        // Basic validation
-        if (!validateForm()) {
-            console.groupEnd();
-            return;
-        }
+        // Show loading state
+        const originalText = elements.submitBtn.innerHTML;
+        elements.submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+        elements.submitBtn.disabled = true;
         
-        // Get form data
-        const formData = {
-            member: elements.memberSelect?.value,
-            month: elements.monthSelect?.value,
-            paidDate: elements.paidDateInput?.value,
-            amount: document.querySelector('#id_amount_paid')?.value || CONFIG.MONTHLY_CONTRIBUTION
-        };
-        
-        console.log('Form data:', formData);
-        
-        // Calculate fine for confirmation
-        const monthInfo = getMonthInfo(formData.month);
-        if (monthInfo) {
-            const paidDate = new Date(formData.paidDate);
-            const result = calculateFine(
-                monthInfo.dueDate,
-                paidDate,
-                monthInfo.monthYear,
-                monthInfo.monthMonth
-            );
-            
-            // Show detailed confirmation
-            if (!await showConfirmationDialog(formData, monthInfo, result)) {
-                console.log('❌ User cancelled submission');
-                console.groupEnd();
-                return;
+        try {
+            // Basic validation
+            if (!validateForm()) {
+                throw new Error('Form validation failed');
             }
+            
+            // Get month info for confirmation
+            const monthId = elements.monthSelect.value;
+            const monthInfo = MONTHS_DATA[monthId];
+            
+            if (monthInfo) {
+                const dueDate = new Date(monthInfo.due_date);
+                const paidDate = new Date(elements.paidDateInput.value);
+                const result = calculateFine(dueDate, paidDate);
+                
+                // Show confirmation dialog
+                if (!await showConfirmationDialog(monthInfo, result, paidDate)) {
+                    throw new Error('User cancelled submission');
+                }
+            }
+            
+            // Submit the form
+            console.log('✅ Submitting form...');
+            elements.paymentForm.submit();
+            
+        } catch (error) {
+            console.error('Submission error:', error);
+            if (error.message !== 'User cancelled submission') {
+                showToast(`Error: ${error.message}`, 'error');
+            }
+        } finally {
+            // Restore button
+            elements.submitBtn.innerHTML = originalText;
+            elements.submitBtn.disabled = false;
+            console.groupEnd();
         }
-        
-        // Submit the form
-        console.log('✅ Submitting form...');
-        elements.paymentForm.submit();
-        console.groupEnd();
     }
     
     function validateForm() {
@@ -807,15 +914,17 @@ function validateDateInput() {
         
         // Date validation
         if (elements.paidDateInput?.value) {
-            const selectedDate = new Date(elements.paidDateInput.value);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            if (selectedDate > today) {
-                errors.push('Payment date cannot be in the future');
-                isValid = false;
+                const selectedDate = new Date(elements.paidDateInput.value);
+                const selectedDateOnly = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+                
+                const now = new Date();
+                const todayOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                
+                if (selectedDateOnly > todayOnly) {
+                    errors.push('Payment date cannot be in the future');
+                    isValid = false;
+                }
             }
-        }
         
         // Show errors if any
         if (errors.length > 0) {
@@ -825,18 +934,21 @@ function validateDateInput() {
         return isValid;
     }
     
-    async function showConfirmationDialog(formData, monthInfo, fineResult) {
-        // Create confirmation message
+    async function showConfirmationDialog(monthInfo, fineResult, paidDate) {
+        const memberName = getSelectedMemberName();
+        const amountPaid = document.querySelector('#id_amount_paid')?.value || CONFIG.MONTHLY_CONTRIBUTION;
+        const totalAmount = parseInt(amountPaid) + fineResult.fine;
+        
         let message = `<div class="text-start">`;
         message += `<h6 class="fw-bold mb-3">Confirm Payment Details</h6>`;
-        message += `<div class="mb-2"><strong>Member:</strong> ${getSelectedMemberName()}</div>`;
-        message += `<div class="mb-2"><strong>Month:</strong> ${monthInfo.monthName}</div>`;
-        message += `<div class="mb-2"><strong>Due Date:</strong> ${monthInfo.dueDate.toLocaleDateString()}</div>`;
-        message += `<div class="mb-2"><strong>Paid Date:</strong> ${new Date(formData.paidDate).toLocaleDateString()}</div>`;
-        message += `<div class="mb-2"><strong>Days Late:</strong> <span class="${fineResult.daysLate > 0 ? 'text-danger' : 'text-success'}">${fineResult.daysLate}</span></div>`;
+        message += `<div class="mb-2"><strong>Member:</strong> ${memberName}</div>`;
+        message += `<div class="mb-2"><strong>Contribution Month:</strong> ${monthInfo.month_name}</div>`;
+        message += `<div class="mb-2"><strong>Due Date:</strong> ${formatDate(new Date(monthInfo.due_date))}</div>`;
+        message += `<div class="mb-2"><strong>Paid Date:</strong> ${formatDate(paidDate)}</div>`;
+        message += `<div class="mb-2"><strong>Days Late:</strong> <span class="${fineResult.daysLate > 0 ? 'text-danger fw-bold' : 'text-success'}">${fineResult.daysLate}</span></div>`;
         
         if (fineResult.fine > 0) {
-            message += `<div class="mb-2"><strong>Fine Amount:</strong> <span class="text-danger">KSh ${fineResult.fine.toLocaleString()}</span></div>`;
+            message += `<div class="mb-2"><strong>Fine Amount:</strong> <span class="text-danger fw-bold">KSh ${fineResult.fine.toLocaleString()}</span></div>`;
             
             if (fineResult.fineBreakdown.lateDays > 0) {
                 message += `<div class="small text-muted mb-2">`;
@@ -848,48 +960,48 @@ function validateDateInput() {
             if (fineResult.maxedOut) {
                 message += `<div class="small text-warning mb-2">`;
                 message += `<i class="bi bi-exclamation-triangle me-1"></i>`;
-                message += `Fines maxed out (stopped on ${fineResult.nextMonth5th.toLocaleDateString()})`;
+                message += `Maximum fine reached (stopped on ${formatDate(fineResult.stopFiningDate)})`;
                 message += `</div>`;
             }
         }
         
         message += `<hr>`;
-        message += `<div class="mb-2"><strong>Monthly Contribution:</strong> KSh ${CONFIG.MONTHLY_CONTRIBUTION.toLocaleString()}</div>`;
-        message += `<div class="mb-2"><strong>Fine:</strong> KSh ${fineResult.fine.toLocaleString()}</div>`;
+        message += `<div class="mb-2"><strong>Monthly Contribution:</strong> KSh ${parseInt(amountPaid).toLocaleString()}</div>`;
+        
+        if (fineResult.fine > 0) {
+            message += `<div class="mb-2"><strong>Fine:</strong> KSh ${fineResult.fine.toLocaleString()}</div>`;
+        }
+        
         message += `<div class="fw-bold fs-5 text-primary">`;
-        message += `Total: KSh ${(CONFIG.MONTHLY_CONTRIBUTION + fineResult.fine).toLocaleString()}`;
+        message += `Total Amount: KSh ${totalAmount.toLocaleString()}`;
         message += `</div>`;
+        message += `<div class="small text-muted mt-2">Status: ${fineResult.daysLate > 0 ? 'Late' : 'On Time'}</div>`;
         message += `</div>`;
         
-        // Use SweetAlert2 for better confirmation dialog
+        // Use SweetAlert2 if available
         if (typeof Swal !== 'undefined') {
             return Swal.fire({
-                title: 'Confirm Payment',
+                title: 'Confirm Payment Recording',
                 html: message,
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Record Payment',
+                confirmButtonText: 'Yes, Record Payment',
                 cancelButtonText: 'Cancel',
                 confirmButtonColor: '#4361ee',
-                cancelButtonColor: '#6c757d'
+                cancelButtonColor: '#6c757d',
+                showClass: { popup: 'animate__animated animate__fadeInDown' },
+                hideClass: { popup: 'animate__animated animate__fadeOutUp' }
             }).then((result) => {
                 return result.isConfirmed;
             });
         }
         
         // Fallback to native confirm
-        const simpleMessage = `Record this payment?\n\n`
-            + `Due: ${monthInfo.dueDate.toLocaleDateString()}\n`
-            + `Paid: ${new Date(formData.paidDate).toLocaleDateString()}\n`
-            + `Days Late: ${fineResult.daysLate}\n`
-            + `Fine: KSh ${fineResult.fine}\n`
-            + `Total: KSh ${CONFIG.MONTHLY_CONTRIBUTION + fineResult.fine}`;
-        
-        return confirm(simpleMessage);
+        return confirm(`Record this payment?\n\nMember: ${memberName}\nMonth: ${monthInfo.month_name}\nDue: ${formatDate(new Date(monthInfo.due_date))}\nPaid: ${formatDate(paidDate)}\nDays Late: ${fineResult.daysLate}\nFine: KSh ${fineResult.fine}\nTotal: KSh ${totalAmount}`);
     }
     
     function getSelectedMemberName() {
-        if (!elements.memberSelect) return 'Unknown';
+        if (!elements.memberSelect) return 'Unknown Member';
         
         const selectedOption = elements.memberSelect.options[elements.memberSelect.selectedIndex];
         return selectedOption.text || 'Unknown Member';
@@ -910,8 +1022,16 @@ function validateDateInput() {
         };
     }
     
+    function formatDate(date) {
+        if (!date) return '-';
+        return date.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
+    
     function showToast(message, type = 'info') {
-        // Create toast element
         const toastId = 'payment-toast-' + Date.now();
         const toastHtml = `
             <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0" role="alert">
@@ -924,27 +1044,18 @@ function validateDateInput() {
             </div>
         `;
         
-        // Add to container
-        const container = document.getElementById('toast-container') || createToastContainer();
-        container.insertAdjacentHTML('beforeend', toastHtml);
-        
-        // Show toast
-        const toastEl = document.getElementById(toastId);
-        const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
-        toast.show();
-        
-        // Remove after hide
-        toastEl.addEventListener('hidden.bs.toast', function() {
-            this.remove();
-        });
-    }
-    
-    function createToastContainer() {
-        const container = document.createElement('div');
-        container.id = 'toast-container';
-        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-        document.body.appendChild(container);
-        return container;
+        const container = document.getElementById('toast-container');
+        if (container) {
+            container.insertAdjacentHTML('beforeend', toastHtml);
+            
+            const toastEl = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+            toast.show();
+            
+            toastEl.addEventListener('hidden.bs.toast', function() {
+                this.remove();
+            });
+        }
     }
     
     // ============================================
@@ -958,14 +1069,13 @@ function validateDateInput() {
     // ============================================
     // MONTHS_DATA FALLBACK
     // ============================================
-    if (typeof window.MONTHS_DATA === 'undefined') {
-        console.warn('MONTHS_DATA not provided by server. Using fallback mode.');
-        window.MONTHS_DATA = {};
+    if (typeof MONTHS_DATA === 'undefined' || Object.keys(MONTHS_DATA).length === 0) {
+        console.warn('MONTHS_DATA not provided by server. Building fallback...');
+        MONTHS_DATA = {};
         
-        // Try to build MONTHS_DATA from form options as fallback
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
-                if (elements.monthSelect && Object.keys(window.MONTHS_DATA).length === 0) {
+                if (elements.monthSelect) {
                     console.log('Building fallback MONTHS_DATA from form options...');
                     Array.from(elements.monthSelect.options).forEach(option => {
                         if (option.value) {
@@ -981,8 +1091,17 @@ function validateDateInput() {
                                 };
                                 
                                 if (monthMap[monthName] !== undefined) {
-                                    const dueDate = new Date(year, monthMap[monthName], CONFIG.DUE_DATE_DAY);
-                                    window.MONTHS_DATA[option.value] = {
+                                    // NEW LOGIC: Due date is 5th of FOLLOWING month
+                                    let dueMonth = monthMap[monthName] + 1;
+                                    let dueYear = year;
+                                    
+                                    if (dueMonth > 11) {
+                                        dueMonth = 0;
+                                        dueYear += 1;
+                                    }
+                                    
+                                    const dueDate = new Date(dueYear, dueMonth, 5);
+                                    MONTHS_DATA[option.value] = {
                                         due_date: dueDate.toISOString(),
                                         month_date: new Date(year, monthMap[monthName], 1).toISOString(),
                                         month_name: option.text
@@ -991,16 +1110,72 @@ function validateDateInput() {
                             }
                         }
                     });
-                    console.log('Fallback MONTHS_DATA built:', window.MONTHS_DATA);
+                    console.log('Fallback MONTHS_DATA built:', MONTHS_DATA);
+                    updateFinePreview(); // Refresh preview with new data
                 }
             }, 1000);
         });
     }
-    </script>
-    
-    <!-- Add this CSS for styling -->
-    
+</script>
 
-
+<style>
+    /* Additional mobile optimizations */
+    @media (max-width: 768px) {
+        .text-tiny-mobile {
+            font-size: 0.75rem !important;
+        }
+        
+        .btn-mobile {
+            padding: 0.5rem 1rem !important;
+            font-size: 0.9rem !important;
+        }
+        
+        .card-body-mobile {
+            padding: 1rem !important;
+        }
+        
+        .input-group-text {
+            padding: 0.375rem 0.75rem !important;
+        }
+        
+        select.form-control, input.form-control {
+            padding: 0.375rem 0.75rem !important;
+            font-size: 0.9rem !important;
+        }
+    }
+    
+    /* Form validation styles */
+    .is-valid {
+        border-color: #198754 !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") !important;
+        background-repeat: no-repeat !important;
+        background-position: right calc(0.375em + 0.1875rem) center !important;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) !important;
+    }
+    
+    .is-invalid {
+        border-color: #dc3545 !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e") !important;
+        background-repeat: no-repeat !important;
+        background-position: right calc(0.375em + 0.1875rem) center !important;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) !important;
+    }
+    
+    /* Animation for fine preview */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    #finePreview {
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    /* Better focus states */
+    .form-control:focus, .form-select:focus {
+        border-color: #4361ee;
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+    }
+</style>
 
 {% endblock %}

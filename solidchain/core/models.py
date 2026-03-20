@@ -28,9 +28,22 @@ class ContributionMonth(models.Model):
         return self.month.strftime("%B %Y")
     
     def save(self, *args, **kwargs):
-        # Auto-set due_date to 5th of the month if not provided
+    # Auto-set due_date to 5th of the FOLLOWING month if not provided
         if not self.due_date:
-            self.due_date = self.month.replace(day=5)
+            # Get the month after self.month
+            month_year = self.month.year
+            month_month = self.month.month
+            
+            if month_month == 12:  # December
+                due_year = month_year + 1
+                due_month = 1  # January
+            else:
+                due_year = month_year
+                due_month = month_month + 1
+            
+            # Set due_date to 5th of the following month
+            self.due_date = date(due_year, due_month, 5)
+        
         super().save(*args, **kwargs)
 
 class Payment(models.Model):
@@ -59,42 +72,42 @@ class Payment(models.Model):
         """
         Calculate fine based on payment date vs due date
         Rules:
-        - 6th-10th: KSh 100 per day (days 1-5 late)
-        - 11th to next month 5th: KSh 15 per day (days 6+ late)
-        - Stops fining on 5th of following month
+        - Fine starts the day after due date (due date is 5th of following month)
+        - Days 1-5 late: KSh 100 per day
+        - Days 6+ late: KSh 25 per day
+        - Stops fining on 5th of month after due date month
         """
-        due_date = self.month.due_date
+        due_date = self.month.due_date  # Should be 5th of following month
         days_late = (self.paid_date - due_date).days
         
         if days_late <= 0:
             return 0  # No fine if paid on or before due date
         
-        # Calculate next month's 5th (when fines stop)
-        # Get the month after the payment month
-        month_year = self.month.month.year
-        month_month = self.month.month.month
+        # Calculate stop date (5th of month after due date month)
+        due_year = due_date.year
+        due_month = due_date.month
         
-        if month_month == 12:  # December
-            next_month_year = month_year + 1
-            next_month_month = 1  # January
+        # Get month after due date month
+        if due_month == 12:  # December
+            stop_year = due_year + 1
+            stop_month = 1  # January
         else:
-            next_month_year = month_year
-            next_month_month = month_month + 1
+            stop_year = due_year
+            stop_month = due_month + 1
         
-        next_month_5th = date(next_month_year, next_month_month, 5)
+        stop_date = date(stop_year, stop_month, 5)  # 5th of month after due date
         
-        # If paid after next month's 5th, calculate only up to next month's 5th
-        if self.paid_date > next_month_5th:
-            days_late = (next_month_5th - due_date).days
+        # If paid after stop date, calculate only up to stop date
+        if self.paid_date > stop_date:
+            days_late = (stop_date - due_date).days
         
-        # Now calculate fine based on corrected days_late
+        # Calculate fine based on days_late
         if days_late <= 5:
-            # Days 1-5 late (6th-10th of month): 100 per day
+            # Days 1-5 late: 100 per day
             return days_late * 100
         else:
-            # Days 6+ late (11th+ of month): 500 for first 5 days + 25 for each additional day
+            # Days 6+ late: 500 for first 5 days + 25 for each additional day
             return (5 * 100) + ((days_late - 5) * 25)
-    
     def determine_status(self):
         """Determine if payment is On Time or Late"""
         due_date = self.month.due_date

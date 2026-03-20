@@ -1,7 +1,7 @@
 # userauths/views.py
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate,logout
 from django.contrib.auth.views import LoginView
 from .forms import SignUpForm
 from django.views.decorators.csrf import csrf_exempt
@@ -52,3 +52,11 @@ class CustomLoginView(LoginView):
     def form_invalid(self, form):
         messages.error(self.request, 'Invalid username or password. Please try again.')
         return super().form_invalid(form)
+    
+def custom_logout(request):
+    """
+    Custom logout view with success message
+    """
+    logout(request)
+    messages.success(request, 'Logged out successfully!')
+    return redirect('userauths:login')
